@@ -28,7 +28,8 @@ class Search
      * @param $closeList
      * @return array
      */
-    public function search($start, $end, $closeList) {
+    public function search($start, $end, $closeList)
+    {
         $result = [];
         $this->openList[] = $start;
         $this->closeList = $closeList;
@@ -50,7 +51,8 @@ class Search
      * @param $end
      * @return mixed
      */
-    public function findWay($current, $end) {
+    public function findWay($current, $end)
+    {
         while ($current !== $end) {
             $current = array_shift($this->openList); // 出栈
             $this->closeList[] = $current;
@@ -97,13 +99,15 @@ class Search
      * @param $end
      * @return number
      */
-    public function calculateH ($point, $end) {
+    public function calculateH ($point, $end)
+    {
         $x = abs($point->getX() - $end->getX());
         $y = abs($point->getY() - $end->getY());
         return $x + $y;
     }
 
-    public function sortOpenList() {
+    public function sortOpenList()
+    {
         $sortArr = $index = [];
         $i = 0;
         foreach ($this->openList as $key => $value) {
