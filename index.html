@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+</head>
+<body>
+    <div>
+        <div>
+            宽：<input type="text" id="w" value="">
+            高：<input type="text" id="h" value="">
+            <input type="button" id="creatM" value="生成地图">
+            <input type="button" id="calculate" value="计算路径">
+        </div>
+        <div id="content">
+
+        </div>
+        <div>
+
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="js/layui/layui.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script>
+    var map = [];
+    var start = [];
+    var end = [];
+    var block = [];
+    var road = [];
+
+    layui.use('layer', function(){
+        var layer= layui.layer
+    });
+
+    $('#creatM').click(function() { //创建地图
+        $('#content').html('');
+        var w = $('#w').val();
+        var h = $('#h').val();
+        map.splice(0,map.length);
+        start.splice(0,start.length);
+        end.splice(0,end.length);
+        block.splice(0,block.length);
+        createMap(w,h);
+    });
+
+    $('#calculate').click(function() {
+        if($('.start').length > 0 && $('.end').length > 0) {
+            if (road.length > 0) {
+                $.each(road, function (k1,v1) {
+                    if ($.inArray(v1.attr('class'),['start', 'end', 'block']) < 0) {
+                        v1.css('background-color','');
+                    }
+                })
+            }
+            $.ajax({
+                url: 'findway.php',
+                type: 'post',
+                data: {
+                    'map': map,
+                    'start' : start,
+                    'end' : end,
+                    'block' : block
+                },
+                dataType: 'json',
+                success: function(re){
+                    $.each(re,function(k,v) {
+                        road.push($("#"+v[0]+"_"+v[1]));
+                        $("#"+v[0]+"_"+v[1]).css('background-color', 'blue');
+                    })
+                }
+            })
+        }else {
+            layer.open({
+                content: '请设置起点和终点'
+                , btn: ['OK']
+                , btn1: function(index, layero){
+                    layer.close(index)
+                }
+            });
+        }
+    });
+
+    function createMap(w,h) { // 执行创建
+        var table = $("<table border='1' cellspacing='0'>");
+        table.appendTo(($("#content")));
+        for(var y=0; y<h; y++) {
+            var tr = $("<tr></tr>");
+            var crossArr = [];
+            tr.appendTo(table);
+            for(var x=0; x<w; x++) {
+                var td = $("<td width='80' height='30' id='"+y+"_"+x+"' x="+x+" y="+y+" onclick='showOpt(this)'></td>");
+                crossArr.push(0);
+                td.appendTo(tr);
+            }
+            map.push(crossArr)
+        }
+        $("#content").append("</table>");
+    }
+
+    function showOpt(tdObj) { // 设置操作
+        var cName = $(tdObj).attr('class');
+        var y = $(tdObj).attr('y');
+        var x = $(tdObj).attr('x');
+        if(cName === undefined) {
+            layer.open({
+                content: '请选择操作'
+                ,btn: ['设为起点', '设为终点', '设为路障']
+                ,btn1: function(index){
+                    if($('.start').length > 0) {
+                        doRemove($('.start'));
+                    }
+                    start = [y,x];
+                    doSet($(tdObj), 'green', 'start');
+                    layer.close(index)
+                }
+                ,btn2: function(index){
+                    if($('.end').length > 0) {
+                        doRemove($('.end'));
+                    }
+                    end = [y,x];
+                    doSet($(tdObj), 'red', 'end');
+                }
+                ,btn3: function(index){
+                    block.push([y,x]);
+                    doSet($(tdObj), 'black', 'block');
+                }
+                ,cancel: function(){
+
+                }
+            });
+        }else{
+            doRemove($(tdObj), cName, y, x);
+        }
+    }
+
+    function doSet(obj, bgc, cName) {
+        obj.css('background-color',bgc);
+        obj.attr('class',cName);
+
+        return true;
+    }
+    
+    function doRemove(obj, cName, y, x) {
+        obj.removeAttr('class');
+        obj.removeAttr('style');
+        if (cName === 'start') {
+            start = [];
+        }else if (cName === 'end'){
+            end = [];
+        }else if (cName === 'block'){
+            block.splice($.inArray([y,x], block),1);
+        }
+
+        return true;
+    }
+
+
+
+</script>
+</html>
