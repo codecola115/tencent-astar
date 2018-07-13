@@ -36,6 +36,7 @@
     var end = [];
     var block = [];
     var road = [];
+    var searchType = '';
 
     layui.use('layer', function(){
         var layer= layui.layer
@@ -55,7 +56,6 @@
 
     $('#calculate').click(function() {
         if($('.start').length > 0 && $('.end').length > 0) {
-            var searchType = $('#searchType').val();
             if (road.length > 0) {
                 $.each(road, function (k1,v1) {
                     if ($.inArray(v1.attr('class'),['start', 'end', 'block']) < 0) {
@@ -63,6 +63,7 @@
                     }
                 })
             }
+            getParam();
             $.ajax({
                 url: 'findway.php',
                 type: 'post',
@@ -75,7 +76,7 @@
                 },
                 dataType: 'json',
                 success: function(re){
-                    road.splice(0,road.length);
+                    road = [];
                     $.each(re,function(k,v) {
                         road.push($("#"+v[0]+"_"+v[1]));
                         $("#"+v[0]+"_"+v[1]).css('background-color', 'blue');
@@ -93,6 +94,17 @@
         }
     });
 
+    function getParam() {
+        block = [];
+        $('.block').each(function () {
+            block.push([$(this).attr('y'), $(this).attr('x')]);
+        });
+
+        start = [$('.start').attr('y'), $('.start').attr('x')];
+        end = [$('.end').attr('y'), $('.end').attr('x')];
+        searchType = $('#searchType').val()
+    }
+
     function createMap(w,h) { // 执行创建
         var table = $("<table border='1' cellspacing='0'>");
         table.appendTo(($("#content")));
@@ -101,7 +113,7 @@
             var crossArr = [];
             tr.appendTo(table);
             for(var x=0; x<w; x++) {
-                var td = $("<td width='80' height='30' id='"+y+"_"+x+"' x="+x+" y="+y+" onclick='showOpt(this)'></td>");
+                var td = $("<td width='80' height='30' class='point' id='"+y+"_"+x+"' x="+x+" y="+y+" onclick='showOpt(this)'></td>");
                 crossArr.push(0);
                 td.appendTo(tr);
             }
@@ -112,9 +124,9 @@
 
     function showOpt(tdObj) { // 设置操作
         var cName = $(tdObj).attr('class');
-        var y = $(tdObj).attr('y');
-        var x = $(tdObj).attr('x');
-        if(cName === undefined) {
+//        var y = $(tdObj).attr('y');
+//        var x = $(tdObj).attr('x');
+        if(cName === 'point') {
             layer.open({
                 content: '请选择操作'
                 ,btn: ['设为起点', '设为终点', '设为路障']
@@ -122,7 +134,7 @@
                     if($('.start').length > 0) {
                         doRemove($('.start'));
                     }
-                    start = [y,x];
+//                    start = [y,x];
                     doSet($(tdObj), 'green', 'start');
                     layer.close(index)
                 }
@@ -130,40 +142,29 @@
                     if($('.end').length > 0) {
                         doRemove($('.end'));
                     }
-                    end = [y,x];
+//                    end = [y,x];
                     doSet($(tdObj), 'red', 'end');
                 }
                 ,btn3: function(index){
-                    block.push([y,x]);
+//                    block.push([y,x]);
                     doSet($(tdObj), 'black', 'block');
                 }
-                ,cancel: function(){
-
-                }
+                ,cancel: function(){}
             });
         }else{
-            doRemove($(tdObj), cName, y, x);
+            doRemove($(tdObj));
         }
     }
 
     function doSet(obj, bgc, cName) {
         obj.css('background-color',bgc);
         obj.attr('class',cName);
-
         return true;
     }
     
-    function doRemove(obj, cName, y, x) {
-        obj.removeAttr('class');
+    function doRemove(obj) {
+        obj.attr('class', 'point');
         obj.removeAttr('style');
-        if (cName === 'start') {
-            start = [];
-        }else if (cName === 'end'){
-            end = [];
-        }else if (cName === 'block'){
-            block.splice($.inArray([y,x], block),1);
-        }
-
         return true;
     }
 
