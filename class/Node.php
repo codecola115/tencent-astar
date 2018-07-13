@@ -14,6 +14,7 @@ class Node
     private $x = 0;
     private $y = 0;
     private $parent = null;
+    private $visited = false;
 
     private $G = 0;
     private $H = 0;
@@ -23,6 +24,16 @@ class Node
     {
         $this->x = (int)$x;
         $this->y = (int)$y;
+    }
+
+    public function visit()
+    {
+        $this->visited = true;
+    }
+
+    public function isVisited()
+    {
+        return $this->visited === true;
     }
 
     /**

@@ -43,6 +43,7 @@
         start.splice(0,start.length);
         end.splice(0,end.length);
         block.splice(0,block.length);
+        road.splice(0,road.length);
         createMap(w,h);
     });
 
@@ -66,6 +67,7 @@
                 },
                 dataType: 'json',
                 success: function(re){
+                    road.splice(0,road.length);
                     $.each(re,function(k,v) {
                         road.push($("#"+v[0]+"_"+v[1]));
                         $("#"+v[0]+"_"+v[1]).css('background-color', 'blue');

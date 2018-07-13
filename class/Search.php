@@ -58,13 +58,15 @@ class Search
                     continue;
                 }
                 $G = $current->getG() + 1; // 距离最小单元为1
-                if (!in_array($neighbor, $this->closeList) || $G < $neighbor->getG()) {
+                $visited = $neighbor->isVisited();
+                if (!$visited || $G < $neighbor->getG()) {
+                    $neighbor->visit();
                     $neighbor->setParent($current);
                     $neighbor->setH($this->calculateH($neighbor, $end));
                     $neighbor->setG($G);
                     $neighbor->setF($neighbor->getH() + $neighbor->getG());
                 }
-                if (!in_array($neighbor, $this->closeList)) {
+                if (!$visited) {
                     array_unshift($this->openList, $neighbor); // 入栈
                 }
             }
