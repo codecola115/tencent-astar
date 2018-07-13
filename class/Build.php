@@ -34,10 +34,10 @@ class Build
     }
 
     /**
-     * @param Node $node
+     * @param $node
      * @return array
      */
-    public function getNeighbors(Node $node)
+    public function getNeighbors($node, $searchType)
     {
         $result = [];
         $x = $node->getX();
@@ -47,8 +47,15 @@ class Build
             [$y - 1, $x],
             [$y + 1, $x],
             [$y, $x - 1],
-            [$y, $x + 1]
+            [$y, $x + 1],
         ];
+
+        if ($searchType == 'oblique') {
+            $neighbourLocations[] = [$y - 1, $x - 1];
+            $neighbourLocations[] = [$y + 1, $x - 1];
+            $neighbourLocations[] = [$y - 1, $x + 1];
+            $neighbourLocations[] = [$y + 1, $x + 1];
+        }
 
         foreach ($neighbourLocations as $location) {
             list($y, $x) = $location;

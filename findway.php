@@ -18,9 +18,10 @@ $map = $_POST['map'];
 $start = $_POST['start'];
 $end = $_POST['end'];
 $block = $_POST['block'];
+$searchType = $_POST['searchType'];
 $closeList = [];
-$nodeObj = new Build($map); // node集合
-$searchObj = new Search($nodeObj);
+$nodeObj = new Build($map); // 创建node对象集合
+$searchObj = new Search($nodeObj, $searchType);
 
 $start = $nodeObj->getPoint($start[0], $start[1]);
 $end = $nodeObj->getPoint($end[0], $end[1]);

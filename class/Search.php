@@ -12,12 +12,14 @@ namespace Astar;
 class Search
 {
     private $nodeObj = null;
+    private $searchType = 'straight';
     private $openList = [];
     private $closeList = [];
 
-    public function __construct($nodeObj)
+    public function __construct($nodeObj, $searchType)
     {
         $this->nodeObj = $nodeObj;
+        $this->searchType = $searchType;
     }
 
     /**
@@ -52,7 +54,7 @@ class Search
         while ($current !== $end) {
             $current = array_shift($this->openList); // 出栈
             $this->closeList[] = $current;
-            $neighbors = $this->nodeObj->getNeighbors($current);
+            $neighbors = $this->nodeObj->getNeighbors($current, $this->searchType); // 获取邻点
             foreach ($neighbors as $neighbor) {
                 if (in_array($neighbor, $this->closeList)) {
                     continue;

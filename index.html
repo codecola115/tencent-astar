@@ -11,7 +11,13 @@
             宽：<input type="text" id="w" value="">
             高：<input type="text" id="h" value="">
             <input type="button" id="creatM" value="生成地图">
+            <select id="searchType">
+                <option value="straight">直线</option>
+                <option value="oblique">斜线</option>
+            </select>
             <input type="button" id="calculate" value="计算路径">
+
+
 	    PS:点击表格选择操作
         </div>
         <div id="content">
@@ -49,6 +55,7 @@
 
     $('#calculate').click(function() {
         if($('.start').length > 0 && $('.end').length > 0) {
+            var searchType = $('#searchType').val();
             if (road.length > 0) {
                 $.each(road, function (k1,v1) {
                     if ($.inArray(v1.attr('class'),['start', 'end', 'block']) < 0) {
@@ -63,7 +70,8 @@
                     'map': map,
                     'start' : start,
                     'end' : end,
-                    'block' : block
+                    'block' : block,
+                    'searchType' : searchType
                 },
                 dataType: 'json',
                 success: function(re){
